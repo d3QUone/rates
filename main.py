@@ -56,45 +56,62 @@ class Adviser(object):
         all_cases = (
             {
                 "name": "EUR[RUB]",
-                "comment": "Convert EUR to RUB",
+                "description": "Convert EUR to RUB",
+                "dimension": "RUB",
                 "value": eur_amount*self.values["EUR"]["RUB"]["buy"],
             },
             {
                 "name": "USD[RUB]",
+                "description": "Convert USD to RUB",
+                "dimension": "RUB",
                 "value": usd_amount*self.values["USD"]["RUB"]["buy"],
             },
             {
                 "name": "EUR[USD]",
+                "description": "Convert EUR to USD",
+                "dimension": "USD",
                 "value": eur_amount*self.values["EUR"]["USD"]["buy"],
             },
             {
                 "name": "USD[EUR]",
+                "description": "Convert USD to EUR",
+                "dimension": "EUR",
                 "value": usd_amount*self.values["USD"]["EUR"]["buy"],
             },
             {
                 "name": "RUB[USD]",
+                "description": "Convert RUB to USD",
+                "dimension": "USD",
                 "value": rub_amount*self.values["USD"]["RUB"]["sell"],
             },
             {
                 "name": "RUB[USD]+EUR[USD]",
+                "description": "Convert RUB and EUR to USD",
+                "dimension": "USD",
                 "value": rub_amount*self.values["USD"]["RUB"]["sell"] + eur_amount*self.values["EUR"]["USD"]["buy"],
             },
             {
                 "name": "RUB[EUR]+USD[EUR]",
+                "description": "Convert RUB and USD to EUR",
+                "dimension": "EUR",
                 "value": rub_amount*self.values["EUR"]["RUB"]["sell"] + usd_amount*self.values["USD"]["EUR"]["buy"],
             },
             {
                 "name": "(EUR[USD]+USD)[RUB]",
+                "description": "Total EUR and USD in USD",
+                "dimension": "RUB",
                 "value": (eur_amount*self.values["EUR"]["USD"]["buy"] + usd_amount)*self.values["USD"]["RUB"]["buy"],
             },
             {
                 "name": "(USD[EUR]+EUR)[RUB]",
+                "description": "Total EUR and USD in EUR",
+                "dimension": "RUB",
                 "value": (usd_amount*self.values["USD"]["EUR"]["buy"] + eur_amount)*self.values["EUR"]["RUB"]["buy"],
             },
         )
         for case in all_cases:
             if "value" in case:
-                log.info("{} = {}".format(case["name"], case["value"]))
+                log.info("{} = {} {}".format(case["description"], round(case["value"], 3), case["dimension"]))
         log.info("")
 
 
