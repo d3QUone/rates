@@ -36,7 +36,7 @@ class Adviser(object):
                     "sell": item["sell"],   # ! bank sells
                     "buy": item["buy"],     # ! bank buys
                 }
-        print json.dumps(self.values, indent=2)
+        log.debug(json.dumps(self.values, indent=2))
 
     def __load_rates(self):
         """Initialize loading action"""
@@ -50,25 +50,52 @@ class Adviser(object):
         """Calculate all variants"""
         self.__load_rates()
 
-        # case1: EUR[RUR]
-        case1 = ""
-
-        # case2: USD[RUR]
-
-        # case3: EUR[USD]
-
-        # case4: USD[EUR]
-
-        # case5: (EUR[USD] + USD)[RUR]
-
-        # case6: (USD[EUR] + EUR)[RUR]
-
-        # and some extra cases:
-        # case7: RUR[USD]
-
-        # case8: RUR[USD] + EUR[USD]
-
-        # case8: RUR[EUR] + USD[EUR]
+        rub_amount = self.values["RUB"]["my_amount"]
+        usd_amount = self.values["USD"]["my_amount"]
+        eur_amount = self.values["EUR"]["my_amount"]
+        all_cases = (
+            {
+                "name": "EUR[RUB]",
+                "comment": "Convert EUR to RUB",
+                "value": eur_amount*self.values["EUR"]["RUB"]["buy"],
+            },
+            {
+                "name": "USD[RUB]",
+                "value": usd_amount*self.values["USD"]["RUB"]["buy"],
+            },
+            {
+                "name": "EUR[USD]",
+                "value": eur_amount*self.values["EUR"]["USD"]["buy"],
+            },
+            {
+                "name": "USD[EUR]",
+                "value": usd_amount*self.values["USD"]["EUR"]["buy"],
+            },
+            {
+                "name": "RUB[USD]",
+                "value": rub_amount*self.values["USD"]["RUB"]["sell"],
+            },
+            {
+                "name": "RUB[USD]+EUR[USD]",
+                "value": rub_amount*self.values["USD"]["RUB"]["sell"] + eur_amount*self.values["EUR"]["USD"]["buy"],
+            },
+            {
+                "name": "RUB[EUR]+USD[EUR]",
+                "value": rub_amount*self.values["EUR"]["RUB"]["sell"] + usd_amount*self.values["USD"]["EUR"]["buy"],
+            },
+            {
+                "name": "(EUR[USD]+USD)[RUB]",
+                "value": (eur_amount*self.values["EUR"]["USD"]["buy"] + usd_amount)*self.values["USD"]["RUB"]["buy"],
+            },
+            {
+                "name": "(USD[EUR]+EUR)[RUB]",
+                "value": (usd_amount*self.values["USD"]["EUR"]["buy"] + eur_amount)*self.values["EUR"]["RUB"]["buy"],
+            },
+        )
+        for case in all_cases:
+            if "value" in case:
+                log.info("{} = {}".format(case["name"], case["value"]))
+        log.info("")
 
 
 if __name__ == "__main__":
