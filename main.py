@@ -12,7 +12,7 @@ log = Logger("rates")
 
 class Adviser(object):
     CATEGORY = "DebitCardsOperations"
-    ALL_CURRENCIES = ("RUR", "USD", "EUR")
+    ALL_CURRENCIES = ("RUB", "USD", "EUR")
 
     def __init__(self):
         self.url = "https://www.tinkoff.ru/api/v1/currency_rates/"
