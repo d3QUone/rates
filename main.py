@@ -82,19 +82,19 @@ class Adviser(object):
                 "name": "RUB[USD]",
                 "description": "Convert RUB to USD",
                 "dimension": "USD",
-                "value": rub_amount*self.values["USD"]["RUB"]["sell"],
+                "value": rub_amount/self.values["USD"]["RUB"]["sell"],
             },
             {
                 "name": "RUB[USD]+EUR[USD]",
                 "description": "Convert RUB and EUR to USD",
                 "dimension": "USD",
-                "value": rub_amount*self.values["USD"]["RUB"]["sell"] + eur_amount*self.values["EUR"]["USD"]["buy"],
+                "value": rub_amount/self.values["USD"]["RUB"]["sell"] + eur_amount*self.values["EUR"]["USD"]["buy"],
             },
             {
                 "name": "RUB[EUR]+USD[EUR]",
                 "description": "Convert RUB and USD to EUR",
                 "dimension": "EUR",
-                "value": rub_amount*self.values["EUR"]["RUB"]["sell"] + usd_amount*self.values["USD"]["EUR"]["buy"],
+                "value": rub_amount/self.values["EUR"]["RUB"]["sell"] + usd_amount*self.values["USD"]["EUR"]["buy"],
             },
             {
                 "name": "(EUR[USD]+USD)[RUB]",
