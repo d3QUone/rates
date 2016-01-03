@@ -5,30 +5,20 @@ import json
 import yaml
 import requests
 
-from logger import Logger
+from logger import Logger, COLORS
 
 log = Logger("rates")
 
 
 class Adviser(object):
+    URL = "https://www.tinkoff.ru/api/v1/currency_rates/"
     CATEGORY = "DebitCardsOperations"
     RUR_key = "RUB"
     USD_key = "USD"
     EUR_key = "EUR"
     ALL_CURRENCIES = (RUR_key, USD_key, EUR_key)
-    COLORS = {
-        'pink': '\033[95m',
-        'blue': '\033[94m',
-        'green': '\033[92m',
-        'yellow': '\033[93m',
-        'red': '\033[91m',
-        'ENDC': '\033[0m',
-        'bold': '\033[1m',
-        'underline': '\033[4m'
-    }
 
     def __init__(self):
-        self.url = "https://www.tinkoff.ru/api/v1/currency_rates/"
         with open("config.yaml", "r") as f:
             self.config = yaml.load(f)
         self.rub_amount = self.config[self.RUR_key]
@@ -53,15 +43,17 @@ class Adviser(object):
     def __load_rates(self):
         """Initialize loading action"""
         try:
-            data = requests.get(self.url).json()
+            data = requests.get(self.URL).json()
             self.__filter_data(data["payload"]["rates"])
         except Exception as e:
             log.error("load_rates error: {}".format(repr(e)))
 
-    # TODO: fix text-log printout (save without color info)
     def str_color(self, color, data):
         """Colorize output"""
-        return "%s%s%s" % (self.COLORS[color], data, self.COLORS['ENDC'])
+        if color in COLORS.keys():
+            return "{{ %s }}%s{{ ENDC }}" % (color, data)
+        else:
+            return "%s" % data
 
     def help(self):
         """Calculate all variants"""

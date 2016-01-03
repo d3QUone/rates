@@ -6,6 +6,8 @@ Tinkoff-Bank debit card rates and suggestions script
 
 Лучше всего использовать в паре с https://tinkoffrates.ru
 
+![Example](assets/v1.png)
+
 ## Setup (global)
 
 1) Install dependencies: `pip install -r requirements.txt`
