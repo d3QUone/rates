@@ -58,6 +58,7 @@ class Adviser(object):
         except Exception as e:
             log.error("load_rates error: {}".format(repr(e)))
 
+    # TODO: fix text-log printout (save without color info)
     def str_color(self, color, data):
         """Colorize output"""
         return "%s%s%s" % (self.COLORS[color], data, self.COLORS['ENDC'])
@@ -65,6 +66,11 @@ class Adviser(object):
     def help(self):
         """Calculate all variants"""
         self.__load_rates()
+
+        all_amount_to_usd = (self.eur_amount * self.values[self.EUR_key][self.USD_key]["buy"] + self.usd_amount) * \
+                            self.values[self.USD_key][self.RUR_key]["buy"]
+        all_amount_to_eur = (self.usd_amount * self.values[self.USD_key][self.EUR_key]["buy"] + self.eur_amount) * \
+                            self.values[self.EUR_key][self.RUR_key]["buy"]
 
         all_cases = (
             {
@@ -115,15 +121,13 @@ class Adviser(object):
                 "name": "(EUR[USD]+USD)[RUB]",
                 "description": "Total EUR and USD in USD",
                 "dimension": "RUB",
-                "value": (self.eur_amount * self.values[self.EUR_key][self.USD_key]["buy"] + self.usd_amount) *
-                         self.values[self.USD_key][self.RUR_key]["buy"],
+                "value": all_amount_to_usd,
             },
             {
                 "name": "(USD[EUR]+EUR)[RUB]",
                 "description": "Total EUR and USD in EUR",
-                "dimension": "RUB\n",  # print hack
-                "value": (self.usd_amount * self.values[self.USD_key][self.EUR_key]["buy"] + self.eur_amount) *
-                         self.values[self.EUR_key][self.RUR_key]["buy"],
+                "dimension": "RUB",
+                "value": all_amount_to_eur,
             },
         )
 
@@ -140,6 +144,18 @@ class Adviser(object):
                     self.str_color("bold", round(case["value"], 3)),
                     self.str_color("blue", case["dimension"])
                 ))
+
+        # show profit
+        if all_amount_to_usd > all_amount_to_eur:
+            log.info("Move all into USD, profit now = {} {}".format(
+                self.str_color("green", round(all_amount_to_usd - all_amount_to_eur, 1)),
+                self.str_color("green", "RUR")
+            ))
+        else:
+            log.info("Move all into EUR, profit now = {} {}".format(
+                self.str_color("green", round(all_amount_to_eur - all_amount_to_usd, 1)),
+                self.str_color("green", "RUR")
+            ))
 
 
 if __name__ == "__main__":
