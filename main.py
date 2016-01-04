@@ -5,7 +5,7 @@ import json
 import yaml
 import requests
 
-from logger import Logger, COLORS
+from logger import Logger
 
 log = Logger("rates")
 
@@ -47,13 +47,6 @@ class Adviser(object):
             self.__filter_data(data["payload"]["rates"])
         except Exception as e:
             log.error("load_rates error: {}".format(repr(e)))
-
-    def str_color(self, color, data):
-        """Colorize output"""
-        if color in COLORS.keys():
-            return "{{ %s }}%s{{ ENDC }}" % (color, data)
-        else:
-            return "%s" % data
 
     def help(self):
         """Calculate all variants"""
@@ -124,29 +117,31 @@ class Adviser(object):
         )
 
         log.info("\n\n\tUSD: {} / {}\n\tEUR: {} / {}\n".format(
-            self.str_color("green", self.values[self.USD_key][self.RUR_key]["buy"]),
-            self.str_color("red", self.values[self.USD_key][self.RUR_key]["sell"]),
-            self.str_color("green", self.values[self.EUR_key][self.RUR_key]["buy"]),
-            self.str_color("red", self.values[self.EUR_key][self.RUR_key]["sell"]),
+            Logger.colorize("green", self.values[self.USD_key][self.RUR_key]["buy"]),
+            Logger.colorize("red", self.values[self.USD_key][self.RUR_key]["sell"]),
+            Logger.colorize("green", self.values[self.EUR_key][self.RUR_key]["buy"]),
+            Logger.colorize("red", self.values[self.EUR_key][self.RUR_key]["sell"]),
         ))
         for case in all_cases:
             if "value" in case and not ("disabled" in case and not case["disabled"]):
                 log.info("{} = {} {}".format(
                     case["description"],
-                    self.str_color("bold", round(case["value"], 3)),
-                    self.str_color("blue", case["dimension"])
+                    Logger.colorize("bold", round(case["value"], 3)),
+                    Logger.colorize("blue", case["dimension"])
                 ))
 
         # show profit
         if all_amount_to_usd > all_amount_to_eur:
-            log.info("Move all into USD, profit now = {} {}".format(
-                self.str_color("green", round(all_amount_to_usd - all_amount_to_eur, 1)),
-                self.str_color("green", "RUR")
+            log.info("Move all into {}, profit now = {} {}".format(
+                Logger.colorize("green", "USD"),
+                Logger.colorize("green", round(all_amount_to_usd - all_amount_to_eur, 1)),
+                Logger.colorize("green", "RUR")
             ))
         else:
-            log.info("Move all into EUR, profit now = {} {}".format(
-                self.str_color("green", round(all_amount_to_eur - all_amount_to_usd, 1)),
-                self.str_color("green", "RUR")
+            log.info("Move all into {}, profit now = {} {}".format(
+                Logger.colorize("green", "EUR"),
+                Logger.colorize("green", round(all_amount_to_eur - all_amount_to_usd, 1)),
+                Logger.colorize("green", "RUR")
             ))
 
 
