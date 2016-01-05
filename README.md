@@ -1,12 +1,16 @@
 Tinkoff-Bank debit card rates and suggestions script
 
-![Example output](assets/v2.png)
+Workflow with the current [config](config.yaml):
+
+![Example output](assets/v3.png)
 
 ### Description
 
 Скрипт работает с официальными курсами валют для дебетовых карт Тинькофф-банка, предлагает варианты арбитража. 
 
 Лучше всего использовать в паре с https://tinkoffrates.ru
+
+## How to
 
 ### Setup, A - global
 
@@ -26,7 +30,7 @@ E.g. on my machine the command is: `alias rates="cd /Users/vladimir/Desktop/rate
 
 ### Usage 
 
-Edit the `config.yaml` file with your money amount and just run the script.
+Edit the [config.yaml](config.yaml) file with your money amount and just run the script.
 
 ------
 
