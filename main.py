@@ -12,7 +12,7 @@ log = Logger("rates")
 
 class Adviser(object):
     URL = "https://www.tinkoff.ru/api/v1/currency_rates/"
-    CATEGORY = "DebitCardsOperations"
+    CATEGORY = "DebitCardsTransfers"
     RUR_key = "RUB"
     USD_key = "USD"
     EUR_key = "EUR"
@@ -67,7 +67,7 @@ class Adviser(object):
             {
                 "name": "USD[RUB]",
                 "description": "Convert USD to RUB",
-                "dimension": "RUB",
+                "dimension": "RUB\n",
                 "value": self.usd_amount * self.values[self.USD_key][self.RUR_key]["buy"],
             },
             {
@@ -75,12 +75,6 @@ class Adviser(object):
                 "description": "Convert EUR to USD",
                 "dimension": "USD",
                 "value": self.eur_amount * self.values[self.EUR_key][self.USD_key]["buy"],
-            },
-            {
-                "name": "USD[EUR]",
-                "description": "Convert USD to EUR",
-                "dimension": "EUR",
-                "value": self.usd_amount * self.values[self.USD_key][self.EUR_key]["buy"],
             },
             {
                 "name": "RUB[USD]",
@@ -91,17 +85,31 @@ class Adviser(object):
             {
                 "name": "RUB[USD]+EUR[USD]",
                 "description": "Convert RUB and EUR to USD",
-                "dimension": "USD",
+                "dimension": "USD\n",
                 "value": self.rub_amount / self.values[self.USD_key][self.RUR_key]["sell"] +
                          self.eur_amount * self.values[self.EUR_key][self.USD_key]["buy"],
+            },
+            # TODO: add total in usd
+            {
+                "name": "USD[EUR]",
+                "description": "Convert USD to EUR",
+                "dimension": "EUR",
+                "value": self.usd_amount * self.values[self.USD_key][self.EUR_key]["buy"],
+            },
+            {
+                "name": "RUB[EUR]",
+                "description": "Convert RUB to EUR",
+                "dimension": "EUR",
+                "value": self.rub_amount / self.values[self.EUR_key][self.RUR_key]["sell"],
             },
             {
                 "name": "RUB[EUR]+USD[EUR]",
                 "description": "Convert RUB and USD to EUR",
-                "dimension": "EUR",
+                "dimension": "EUR\n",
                 "value": self.rub_amount / self.values[self.EUR_key][self.RUR_key]["sell"] +
                          self.usd_amount * self.values[self.USD_key][self.EUR_key]["buy"],
             },
+            # TODO: add total in eur
             {
                 "name": "(EUR[USD]+USD)[RUB]",
                 "description": "Total EUR and USD in USD",
@@ -115,34 +123,38 @@ class Adviser(object):
                 "value": all_amount_to_eur,
             },
         )
-
-        log.info("\n\n\tUSD: {} / {}\n\tEUR: {} / {}\n".format(
+        
+        s = "\n\n\t{} USD, {} EUR, {} RUR\n\n\tUSD/RUR: {} / {}\n\tEUR/RUR: {} / {}\n\n".format(
+            Logger.colorize("green" if self.usd_amount > 0 else "red", self.usd_amount),
+            Logger.colorize("green" if self.eur_amount > 0 else "red", self.eur_amount),
+            Logger.colorize("green" if self.rub_amount > 0 else "red", self.rub_amount),
             Logger.colorize("green", self.values[self.USD_key][self.RUR_key]["buy"]),
             Logger.colorize("red", self.values[self.USD_key][self.RUR_key]["sell"]),
             Logger.colorize("green", self.values[self.EUR_key][self.RUR_key]["buy"]),
             Logger.colorize("red", self.values[self.EUR_key][self.RUR_key]["sell"]),
-        ))
+        )
         for case in all_cases:
             if "value" in case and not ("disabled" in case and not case["disabled"]):
-                log.info("{} = {} {}".format(
+                s += "{} = {} {}\n".format(
                     case["description"],
                     Logger.colorize("bold", round(case["value"], 3)),
                     Logger.colorize("blue", case["dimension"])
-                ))
-
+                )
         # show profit
         if all_amount_to_usd > all_amount_to_eur:
-            log.info("Move all into {}, profit now = {} {}".format(
+            s += "If move all into {} profit = {} {}\n".format(
                 Logger.colorize("green", "USD"),
                 Logger.colorize("green", round(all_amount_to_usd - all_amount_to_eur, 1)),
                 Logger.colorize("green", "RUR")
-            ))
+            )
         else:
-            log.info("Move all into {}, profit now = {} {}".format(
+            s += "If move all into {} profit = {} {}\n".format(
                 Logger.colorize("green", "EUR"),
                 Logger.colorize("green", round(all_amount_to_eur - all_amount_to_usd, 1)),
                 Logger.colorize("green", "RUR")
-            ))
+            )
+        s += "=" * 50
+        log.info(s)
 
 
 if __name__ == "__main__":
