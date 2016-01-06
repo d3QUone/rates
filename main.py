@@ -1,5 +1,6 @@
 __author__ = 'vladimir'
 
+import sys
 import json
 
 import yaml
@@ -47,6 +48,38 @@ class Adviser(object):
             self.__filter_data(data["payload"]["rates"])
         except Exception as e:
             log.error("load_rates error: {}".format(repr(e)))
+
+    def show_available(self):
+        return "{} RUR, {} USD, {} EUR".format(
+            Logger.colorize("green" if self.rub_amount > 0 else "red", self.rub_amount),
+            Logger.colorize("green" if self.usd_amount > 0 else "red", self.usd_amount),
+            Logger.colorize("green" if self.eur_amount > 0 else "red", self.eur_amount),
+        )
+
+    def get(self, args):
+        if len(args) == 4:
+            _, _, amount, currency = args
+            if currency not in self.ALL_CURRENCIES:
+                log.error("Currency {} is not supported".format(
+                    Logger.colorize("blue", currency)
+                ))
+                return
+        elif len(args) == 3:
+            _, _, amount = args
+            currency = self.RUR_key
+            log.info("No currency was provided, using {} by default".format(
+                Logger.colorize("blue", currency)
+            ))
+        else:
+            log.error("Usage: {} {}".format(
+                Logger.colorize("green", "get"),
+                Logger.colorize("red", "amount [currency]")
+            ))
+            return
+
+        s = "\n\n\t{}".format(self.show_available())
+
+        log.info(s)
 
     def help(self):
         """Calculate all variants"""
@@ -124,10 +157,8 @@ class Adviser(object):
             },
         )
         
-        s = "\n\n\t{} USD, {} EUR, {} RUR\n\n\tUSD/RUR: {} / {}\n\tEUR/RUR: {} / {}\n\n".format(
-            Logger.colorize("green" if self.usd_amount > 0 else "red", self.usd_amount),
-            Logger.colorize("green" if self.eur_amount > 0 else "red", self.eur_amount),
-            Logger.colorize("green" if self.rub_amount > 0 else "red", self.rub_amount),
+        s = "\n\n\t{}\n\n\tUSD/RUR: {} / {}\n\tEUR/RUR: {} / {}\n\n".format(
+            self.show_available(),
             Logger.colorize("green", self.values[self.USD_key][self.RUR_key]["buy"]),
             Logger.colorize("red", self.values[self.USD_key][self.RUR_key]["sell"]),
             Logger.colorize("green", self.values[self.EUR_key][self.RUR_key]["buy"]),
@@ -158,5 +189,15 @@ class Adviser(object):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        command = sys.argv[1]
+    else:
+        command = None
+
     adviser = Adviser()
-    adviser.help()
+    if not command:
+        adviser.help()
+    elif command == "get":
+        adviser.get(sys.argv)
+    else:
+        log.error("Command {} is not available".format(Logger.colorize("red", command)))
