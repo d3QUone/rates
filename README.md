@@ -2,7 +2,7 @@ Tinkoff-Bank debit card rates and suggestions script
 
 Workflow with the current [config](config.yaml):
 
-![Example output](assets/v3.png)
+![Example output](assets/v4.png)
 
 ### Description
 
